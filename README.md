@@ -55,7 +55,7 @@ npm install @awesome-cordova-plugins/email-composer @awesome-cordova-plugins/cor
 ## Ejecución
 ### 4. Iniciar el backend (API y base de datos)
 Para establecer conexión con la base de datos, sigue las instrucciones del siguiente repositorio:
-[Repositorio TestApi_Django](https://github.com/Pablo-Maldonado-Presas/te-llevo-api)
+[Repositorio TeLlevo API](https://github.com/Pablo-Maldonado-Presas/te-llevo-api)
 
 ### 5. Ejecutar la aplicación Ionic
 Ejecutar en la carpeta del proyecto Ionic:
