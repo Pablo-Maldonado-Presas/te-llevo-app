@@ -1,0 +1,7 @@
+{
+  "name": "angularMaterials",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>TeLlevoAPP</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <div class="contenedor">
+    <div class="logo">
+      <img src="assets/img/auto.png" alt="Auto" />
+    </div>
+
+    <div class="form">
+      <ion-item>
+        <ion-label position="floating">Correo Electrónico</ion-label>
+        <ion-input [(ngModel)]="email" data-cy="email-input" type="text"></ion-input>
+      </ion-item>
+
+      <ion-button expand="full" (click)="recuperar()">Recuperar</ion-button>
+
+      <div class="spacer"></div>
+
+    </div>
+
+    <div *ngIf="errorMessage" [ngClass]="{'error-message': true, 'hidden': !errorMessageVisible}">
+      {{ errorMessage }}
+    </div>
+
+  </div>
+</ion-content>

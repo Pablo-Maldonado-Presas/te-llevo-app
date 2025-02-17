@@ -1,0 +1,152 @@
+<ion-header [translucent]="true">
+  <mat-toolbar>
+    <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>TeLlevoAPP</span>
+    <span class="example-spacer"></span>
+    <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
+      <mat-icon>favorite</mat-icon>
+    </button>
+    <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
+      <mat-icon>share</mat-icon>
+    </button>
+    <button mat-icon-button (click)="cerrarSesionDialogo()" aria-label="Cerrar sesión">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="contenedor">
+    <strong>
+      <p class="username-text">Bienvenid&#64; {{ nombre }}</p>
+      <p class="user-type">{{ userType }}</p>
+    </strong>
+
+
+    <!-- Vista de chofer -->
+    <div *ngIf="userType === 'Chofer'">
+      <!-- Si no hay un viaje en progreso, mostrar el formulario -->
+      <div class="form" *ngIf="!viajeEnProgresoChofer">
+        <ion-item>
+          <ion-label>Selecciona la hora de salida</ion-label>
+          <ion-datetime id="horaSalida" [value]="horaSalida" presentation="time" displayFormat="HH:mm"
+            [(ngModel)]="horaSalida"></ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Cantidad de pasajeros</ion-label>
+          <ion-input id="cantidadPasajeros" [(ngModel)]="capacidadPasajeros" type="number"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Precio por persona</ion-label>
+          <ion-input id="precioPorPersona" [(ngModel)]="precioPorPersona" type="number"></ion-input>
+        </ion-item>
+
+        <ion-button expand="full" (click)="generarViaje()">
+          Programar Viaje
+        </ion-button>
+
+        <div *ngIf="errorMessage" [ngClass]="{'error-message': true, 'hidden': !errorMessageVisible}">
+          {{ errorMessage }}
+        </div>
+      </div>
+
+
+
+      <!-- Si hay un viaje en progreso, mostrar la información del viaje y los botones de finalizar y cancelar -->
+      <div *ngIf="viajeEnProgresoChofer">
+        <h2>Viaje programado</h2>
+        <p>Sede: {{ viajeEnProgresoChofer.sede }}</p>
+        <p>Hora de salida: {{ viajeEnProgresoChofer.horaSalida }}</p>
+        <p>Vehículo: {{ viajeEnProgresoChofer.marcaVehiculo }} {{ viajeEnProgresoChofer.modeloVehiculo }} {{
+          viajeEnProgresoChofer.colorVehiculo }}</p>
+        <p>Patente: {{ viajeEnProgresoChofer.patenteVehiculo }}</p>
+        <p>Pasajeros:</p>
+        <ul>
+          <li *ngFor="let correo of correosPasajeros" [hidden]="!correo">
+            {{ correo.split('@')[0] }}
+          </li>
+        </ul>
+        <ion-button color="success" (click)="finalizarChoferDialogo()" aria-label="finalizarViajeChofer">
+          Finalizar Viaje
+        </ion-button>
+        <ion-button color="danger" (click)="cancelarChoferDialogo()" aria-label="cancelarViajeChofer">
+          Cancelar Viaje
+        </ion-button>
+      </div>
+    </div>
+
+
+    <!--Vista del pasajero-->
+    <div *ngIf="userType === 'Pasajero'">
+
+      <!-- Si no hay viaje en progreso -->
+      <div *ngIf="!viajeEnProgresoPasajero">
+
+        <ion-button expand="full" (click)="buscarViaje()">
+          <ng-container *ngIf="!buscandoViaje">Buscar viaje</ng-container>
+          <ng-container *ngIf="buscandoViaje">Buscando viaje...</ng-container>
+        </ion-button>
+        <mat-progress-bar mode="indeterminate" *ngIf="buscandoViaje"></mat-progress-bar>
+
+        <div *ngIf="viajes && viajes.length > 0" class="responsive-table">
+          <h2 style="text-align: center">Viajes disponibles</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Sede</th>
+                <th>Hora de salida</th>
+                <th>Vehículo</th>
+                <th>Patente</th>
+                <th>Capacidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let viaje of viajes">
+                <tr *ngIf="contarPasajeros(viaje.correoPasajero) < viaje.capacidadPasajeros && viaje.estadoViaje === 'Programado'">
+                  <td data-label="Sede">{{ viaje.sede }}</td>
+                  <td data-label="Hora de salida">{{ viaje.horaSalida }}</td>
+                  <td data-label="Vehículo">
+                    {{viaje.marcaVehiculo}} <br>
+                    {{viaje.modeloVehiculo}} <br>
+                    {{viaje.colorVehiculo}} <br>
+                  </td>
+                  <td data-label="Patente">{{ viaje.patenteVehiculo }}</td>
+                  <td data-label="Capacidad">{{ contarPasajeros(viaje.correoPasajero) }}/{{ viaje.capacidadPasajeros }}</td>
+                  <td data-label="Acciones">
+                    <ion-button color="success" (click)="seleccionarViaje(viaje)">
+                      ${{ viaje.precioPorPersona }} p/persona <br>
+                      Seleccionar
+                    </ion-button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Si hay viaje en progreso -->
+      <div *ngIf="viajeEnProgresoPasajero">
+        <h2>Viaje programado</h2>
+        <p>Chofer: {{ viajeEnProgresoPasajero.correoChofer.split('@')[0] }}</p>
+        <p>Sede: {{ viajeEnProgresoPasajero.sede }}</p>
+        <p>Hora de salida: {{ viajeEnProgresoPasajero.horaSalida }}</p>
+        <p>Vehículo: {{ viajeEnProgresoPasajero.marcaVehiculo }} {{ viajeEnProgresoPasajero.modeloVehiculo }} {{
+          viajeEnProgresoPasajero.colorVehiculo }}</p>
+        <p>Patente: {{ viajeEnProgresoPasajero.patenteVehiculo }}</p>
+        <ion-button expand="full" (click)="cancelarPasajeroDialogo(viajeEnProgresoPasajero)"
+          aria-label="cancelarViajePasajero">Cancelar viaje</ion-button>
+      </div>
+    </div>
+
+    <div class="auto">
+      <img src="assets/img/auto.png" alt="auto" />
+    </div>
+  </div>
+</ion-content>
